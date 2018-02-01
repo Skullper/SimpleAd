@@ -7,8 +7,10 @@ Add this to your top-level gradle file:
 
 ```groovy
 repositories{
+
   ...
   maven { url 'https://jitpack.io' }
+  
 }
 ```
 
@@ -18,12 +20,12 @@ Then add dependency into your build.gradle file:
 implementation 'com.github.Skullper:SimpleAd:1.1'
 ```
 
-If you are using support libraries lower then v26 you can exclude support group from this dependency:
+If you have some issues with support libraries you can exclude support group from this dependency:
 
 ```groovy
 implementation ('com.github.Skullper:SimpleAd:1.1'){
         exclude group: 'com.android.support', module: 'appcompat-v7'
-    }
+}
 ```
     
 # How to use   
