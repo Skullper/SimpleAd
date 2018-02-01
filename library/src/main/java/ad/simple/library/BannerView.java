@@ -4,6 +4,7 @@ import android.app.DialogFragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,24 +13,32 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.Toast;
 
-/**
- * Created by pugman on 16.01.18.
- * Contact the developer - sckalper@gmail.com
- * company - A2Lab
+import java.util.concurrent.ExecutionException;
+
+/*
+  Created by pugman on 16.01.18.
+  Contact the developer - sckalper@gmail.com
+  company - A2Lab
  */
 
+/**
+ * Created for displaying fullscreen advertising
+ */
 public class BannerView extends DialogFragment implements View.OnClickListener{
 
-	private static final String ARG_URL = "ad_url";
+	private static final String ARG_PACKAGE_NAME = "ad_package_name";
+
+	private String adUrl = null;
 
 	/**
 	 *
-	 * @param url will be loaded in banner view
+	 * @param packageName on which to return ad's url
 	 */
-	public static BannerView newInstance(@NonNull String url){
+	public static BannerView newInstance(@NonNull String packageName){
 		Bundle args = new Bundle();
-		args.putString(ARG_URL, url);
+		args.putString(ARG_PACKAGE_NAME, packageName);
 		BannerView fragment = new BannerView();
 		fragment.setArguments(args);
 		return fragment;
@@ -40,13 +49,23 @@ public class BannerView extends DialogFragment implements View.OnClickListener{
 		super.onCreate(savedInstanceState);
 		//attribute that makes the banner view full-screen
 		setStyle(STYLE_NO_FRAME, android.R.style.Theme_Holo_Light);
+
+		Bundle args = getArguments();
+		String packageName = args != null ? args.getString(ARG_PACKAGE_NAME) : "";
+
+		HttpGetRequest request = new HttpGetRequest();
+		try{
+			adUrl = request.execute(packageName).get();
+		} catch(InterruptedException e){
+			Log.e("RESULT", "Interrupted: " + e.getMessage());
+		} catch(ExecutionException e){
+			Log.e("RESULT", "Execution failed: " + e.getMessage());
+		}
 	}
 
 	@Nullable
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
-		Bundle args = getArguments();
-		String url = args != null ? args.getString(ARG_URL) : "";
 		//Banner view layout
 		FrameLayout contentView = new FrameLayout(getActivity());
 		//Create and init web view
@@ -72,7 +91,13 @@ public class BannerView extends DialogFragment implements View.OnClickListener{
 		//Set up web view and start displaying url content
 		WebViewClient bannerClient = new WebViewClient();
 		bannerView.setWebViewClient(bannerClient);
-		bannerView.loadUrl(url);
+		if(adUrl == null) {
+			Log.e("BANNER_VIEW", "Url == null. Url cannot be loaded or was not initialized for requested package name");
+			Toast.makeText(getActivity(), "Cannot load advertising", Toast.LENGTH_SHORT).show();
+			dismiss();
+		} else{
+			bannerView.loadUrl(adUrl);
+		}
 		return contentView;
 	}
 

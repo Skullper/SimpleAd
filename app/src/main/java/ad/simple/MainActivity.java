@@ -11,7 +11,7 @@ public class MainActivity extends Activity{
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		BannerView bannerView = BannerView.newInstance("https://stackoverflow.com/questions/18097748/how-to-get-row-count-in-sqlite-using-android");
+		BannerView bannerView = BannerView.newInstance(getPackageName());
 		bannerView.show(getFragmentManager(), "BANNER");
 	}
 }
