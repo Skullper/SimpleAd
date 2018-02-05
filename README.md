@@ -27,6 +27,12 @@ implementation ('com.github.Skullper:SimpleAd:1.1'){
         exclude group: 'com.android.support', module: 'appcompat-v7'
 }
 ```
+
+If your minSdkVersion lower than 16 add this to your manifest file:
+
+```xml
+<uses-sdk tools:overrideLibrary="ad.simple.library"/>
+```
     
 # How to use   
 
